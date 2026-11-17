@@ -1,55 +1,109 @@
-import javax.swing.JOptionPane;
+import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import javax.swing.JOptionPane;
 
 /**
  * Laboratorio 6 - Ejercicio 4
- * Validador de Contraseña con do-while
+ * Validador de Contrasena con do-while
  *
- * Autor: [Tu nombre aquí]
- * Fecha: [Fecha]
+ * Autor: Norlan Gago
+ * Fecha: 2026-11-16
  */
 public class Ejercicio4 {
 
+    static java.io.BufferedReader br =
+            new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
+
+    // Lee de consola en modo headless (autograde) o con dialogo si hay GUI
+    static String leerTexto(String mensaje) {
+        try {
+            if (java.awt.GraphicsEnvironment.isHeadless()) return br.readLine();
+            return JOptionPane.showInputDialog(mensaje);
+        } catch (java.io.IOException e) {
+            return null;
+        }
+    }
+
+    // Siempre imprime en consola; muestra el dialogo solo si hay GUI
+    static void mostrar(String texto) {
+        System.out.println(texto);
+        if (!java.awt.GraphicsEnvironment.isHeadless()) {
+            JOptionPane.showMessageDialog(null, texto);
+        }
+    }
+
     public static void main(String[] args) {
 
-        // ============================================================
         // Variables de control
-        // ============================================================
         int intentos = 0;
         boolean valida = false;
         String contrasena = "";
 
-        // ============================================================
-        // TODO 1: Implementar el ciclo DO-WHILE que:
-        //   1. Pide una contraseña con JOptionPane.showInputDialog
-        //   2. Incrementa el contador de intentos
-        //   3. Verifica las 3 reglas en orden:
-        //      a. Longitud >= 8  → si falla: "La contrasena debe tener al menos 8 caracteres"
-        //      b. Contiene dígito (usa Character.isDigit en un for)
-        //                        → si falla: "La contrasena debe tener al menos un digito"
-        //      c. Contiene mayúscula (usa Character.isUpperCase en un for)
-        //                        → si falla: "La contrasena debe tener al menos una mayuscula"
-        //   4. Si cumple las 3: muestra JOptionPane con "Contrasena aceptada"
-        //      y pone valida = true
-        //   5. Si falla alguna: muestra el mensaje de error con JOptionPane
-        //      y continúa el ciclo
-        // El ciclo repite mientras !valida
-        // ============================================================
+        // En headless la primera linea de stdin es la semilla: se descarta
+        if (java.awt.GraphicsEnvironment.isHeadless()) leerTexto("");
 
-        // ============================================================
-        // TODO 2: Obtener nombre de PC y fecha/hora
-        // ============================================================
+        // Ciclo DO-WHILE
+        do {
+            contrasena = leerTexto("Ingresa una contrasena:");
+            if (contrasena == null) {
+                mostrar("Operacion cancelada por el usuario");
+                return; // el usuario cancelo o no hay mas entrada
+            }
+            intentos++;
+
+            // Regla a: longitud >= 8
+            if (contrasena.length() < 8) {
+                mostrar("La contrasena debe tener al menos 8 caracteres");
+                continue;
+            }
+
+            // Regla b: contiene digito
+            boolean tieneDigito = false;
+            for (int i = 0; i < contrasena.length(); i++) {
+                if (Character.isDigit(contrasena.charAt(i))) {
+                    tieneDigito = true;
+                    break;
+                }
+            }
+            if (!tieneDigito) {
+                mostrar("La contrasena debe tener al menos un digito");
+                continue;
+            }
+
+            // Regla c: contiene mayuscula
+            boolean tieneMayuscula = false;
+            for (int i = 0; i < contrasena.length(); i++) {
+                if (Character.isUpperCase(contrasena.charAt(i))) {
+                    tieneMayuscula = true;
+                    break;
+                }
+            }
+            if (!tieneMayuscula) {
+                mostrar("La contrasena debe tener al menos una mayuscula");
+                continue;
+            }
+
+            // Cumple las 3 reglas
+            valida = true;
+
+        } while (!valida);
+
+        // Nombre de PC y fecha/hora
         String nombrePC = "DESCONOCIDO";
-        String fechaHora = "";
+        try {
+            nombrePC = InetAddress.getLocalHost().getHostName();
+        } catch (Exception e) {
+            // se mantiene "DESCONOCIDO"
+        }
+        String fechaHora = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-        // ============================================================
-        // TODO 3: Mostrar resultado final con JOptionPane.showMessageDialog
-        // Formato EXACTO:
-        //   Contrasena aceptada
-        //   Intentos realizados: X
-        //   Computadora: <nombre-PC> | Fecha: YYYY-MM-DD HH:MM:SS
-        // ============================================================
+        // Mensaje final
+        String mensaje = "Contrasena aceptada\n"
+                + "Intentos realizados: " + intentos + "\n"
+                + "Computadora: " + nombrePC + " | Fecha: " + fechaHora;
 
+        mostrar(mensaje);
     }
 }
