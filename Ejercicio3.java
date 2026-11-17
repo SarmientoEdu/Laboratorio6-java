@@ -1,4 +1,6 @@
 import javax.swing.JOptionPane;
+
+import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -13,42 +15,47 @@ public class Ejercicio3 {
 
     public static void main(String[] args) {
 
-        // ============================================================
-        // TODO 1: Leer la semilla (últimos 3 dígitos de tu cédula)
-        // ============================================================
+String inputSemilla = JOptionPane.showInputDialog("Ingrese los últimos 3 dígitos de su cédula (semilla):");
         int semilla = 0;
+        try {
+            if (inputSemilla != null) {
+                semilla = Integer.parseInt(inputSemilla.trim());
+            }
+        } catch (NumberFormatException e) {
+            semilla = 0;
+        }
 
-        // ============================================================
-        // TODO 2: Calcular N y K con la semilla:
-        //   N = 5 + (semilla % 10)    → cantidad de términos (5-14)
-        //   K = 2 + (semilla % 8)     → múltiplo base (2-9)
-        // ============================================================
-        int n = 0;
-        int k = 0;
+        int n = 5 + (int) (semilla % 10);
+        int k = 2 + (int) (semilla % 8);
 
-        // ============================================================
-        // TODO 3: Construir la serie usando un ciclo WHILE
-        //   - Acumula la suma total
-        //   - Construye un String con los términos separados por coma
-        //     Ejemplo: "3, 6, 9, 12, 15"
-        // ============================================================
         int sumaTotal = 0;
         StringBuilder serie = new StringBuilder();
-        // --- escribe el ciclo while aquí ---
+        int i = 1;
 
-        // ============================================================
-        // TODO 4: Obtener nombre de PC y fecha/hora
-        // ============================================================
+        while (i <= n) {
+            int termino = i * k;
+            sumaTotal += termino;
+            if (i == 1) {
+                serie.append(termino);
+            } else {
+                serie.append(", ").append(termino);
+            }
+            i++;
+        }
+
         String nombrePC = "DESCONOCIDO";
-        String fechaHora = "";
+        try {
+            nombrePC = InetAddress.getLocalHost().getHostName();
+        } catch (Exception e) {
+            nombrePC = "LOCAL";
+        }
 
-        // ============================================================
-        // TODO 5: Mostrar resultado con JOptionPane.showMessageDialog
-        // Formato EXACTO:
-        //   Serie: K, 2K, 3K, ... (N terminos)
-        //   Suma total: XXXX
-        //   Computadora: <nombre-PC> | Fecha: YYYY-MM-DD HH:MM:SS
-        // ============================================================
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String fechaHora = dtf.format(LocalDateTime.now());
 
+        String resultado = String.format("Serie: %s (%d terminos)\nSuma total: %d\nComputadora: %s | Fecha: %s",
+                serie.toString(), n, sumaTotal, nombrePC, fechaHora);
+
+        JOptionPane.showMessageDialog(null, resultado);
     }
-}
+}       
