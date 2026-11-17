@@ -1,0 +1,60 @@
+import java.net.InetAddress;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import javax.swing.JOptionPane;
+
+/**
+ * Laboratorio 6 - Ejercicio 1
+ * Clasificador de Temperatura con if/else if/else
+ *
+ * Autor: Quiroz Miguel
+ * Fecha: 2026-11-16
+ */
+public class Ejercicio1 {
+
+    public static void main(String[] args) {
+
+        // TODO 1: leer la semilla (texto -> entero)
+        String entrada = JOptionPane.showInputDialog(
+                "Ingresa los ultimos 3 digitos de tu cedula:");
+        int semilla = Integer.parseInt(entrada.trim());
+
+        // TODO 2: calcular la temperatura
+        int base = (semilla % 60) - 10;
+        double temp = base + (semilla % 7) * 0.5;
+
+        // TODO 3: clasificar (de menor a mayor)
+        String clasificacion;
+        if (temp < 0) {
+            clasificacion = "Congelante";
+        } else if (temp < 10) {
+            clasificacion = "Frio";
+        } else if (temp < 20) {
+            clasificacion = "Fresco";
+        } else if (temp < 30) {
+            clasificacion = "Templado";
+        } else if (temp < 40) {
+            clasificacion = "Caluroso";
+        } else {
+            clasificacion = "Peligroso";
+        }
+
+        // TODO 4: nombre del PC y fecha/hora
+        String nombrePC;
+        try {
+            nombrePC = InetAddress.getLocalHost().getHostName();
+        } catch (Exception e) {
+            nombrePC = "DESCONOCIDO";
+        }
+        String fechaHora = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        // TODO 5: mostrar el resultado con el formato exacto
+        String mensaje = "Temperatura: " + String.format(Locale.US, "%.1f", temp) + " °C\n"
+                + "Clasificacion: " + clasificacion + "\n"
+                + "Computadora: " + nombrePC + " | Fecha: " + fechaHora;
+
+        JOptionPane.showMessageDialog(null, mensaje);
+    }
+}
