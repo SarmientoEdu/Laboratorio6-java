@@ -1,6 +1,8 @@
 import javax.swing.JOptionPane;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * Laboratorio 6 - Ejercicio 4
@@ -22,34 +24,77 @@ public class Ejercicio4 {
 
         // ============================================================
         // TODO 1: Implementar el ciclo DO-WHILE que:
-        //   1. Pide una contraseña con JOptionPane.showInputDialog
-        //   2. Incrementa el contador de intentos
-        //   3. Verifica las 3 reglas en orden:
-        //      a. Longitud >= 8  → si falla: "La contrasena debe tener al menos 8 caracteres"
-        //      b. Contiene dígito (usa Character.isDigit en un for)
-        //                        → si falla: "La contrasena debe tener al menos un digito"
-        //      c. Contiene mayúscula (usa Character.isUpperCase en un for)
-        //                        → si falla: "La contrasena debe tener al menos una mayuscula"
-        //   4. Si cumple las 3: muestra JOptionPane con "Contrasena aceptada"
-        //      y pone valida = true
-        //   5. Si falla alguna: muestra el mensaje de error con JOptionPane
-        //      y continúa el ciclo
-        // El ciclo repite mientras !valida
-        // ============================================================
+        do {
+            contrasena = JOptionPane.showInputDialog(
+                "Ingrese una contraseña:"
+            );
+
+            intentos++;
+
+            String mensajeError = "";
+
+            if (contrasena.length() < 8) {
+                mensajeError = "La contrasena debe tener al menos 8 caracteres";
+            } else {
+
+                boolean tieneDigito = false;
+
+                for (int i = 0; i < contrasena.length(); i++) {
+                    if (Character.isDigit(contrasena.charAt(i))) {
+                        tieneDigito = true;
+                        break;
+                    }
+                }
+
+                if (!tieneDigito) {
+                    mensajeError = "La contrasena debe tener al menos un digito";
+                } else {
+
+                    boolean tieneMayuscula = false;
+
+                    for (int i = 0; i < contrasena.length(); i++) {
+                        if (Character.isUpperCase(contrasena.charAt(i))) {
+                            tieneMayuscula = true;
+                            break;
+                        }
+                    }
+
+                    if (!tieneMayuscula) {
+                        mensajeError = "La contrasena debe tener al menos una mayuscula";
+                    }
+                }
+            }
+
+            if (mensajeError.equals("")) {
+                JOptionPane.showMessageDialog(null, "Contrasena aceptada");
+                valida = true;
+            } else {
+                JOptionPane.showMessageDialog(null, mensajeError);
+            }
+
+        } while (!valida);
 
         // ============================================================
         // TODO 2: Obtener nombre de PC y fecha/hora
-        // ============================================================
         String nombrePC = "DESCONOCIDO";
-        String fechaHora = "";
 
+        try {
+            nombrePC = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            nombrePC = "DESCONOCIDO";
+        }
+
+        LocalDateTime ahora = LocalDateTime.now();
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String fechaHora = ahora.format(formato);
         // ============================================================
         // TODO 3: Mostrar resultado final con JOptionPane.showMessageDialog
-        // Formato EXACTO:
-        //   Contrasena aceptada
-        //   Intentos realizados: X
-        //   Computadora: <nombre-PC> | Fecha: YYYY-MM-DD HH:MM:SS
-        // ============================================================
+        String resultado =
+            "Contrasena aceptada\n" +
+            "Intentos realizados: " + intentos + "\n" +
+            "Computadora: " + nombrePC + " | Fecha: " + fechaHora;
+
+        JOptionPane.showMessageDialog(null, resultado);
 
     }
 }
