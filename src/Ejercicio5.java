@@ -1,68 +1,94 @@
-import javax.swing.JOptionPane;
+import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import javax.swing.JOptionPane;
 
 /**
  * Laboratorio 6 - Ejercicio 5
- * Tabla de Multiplicar con for y Manejo de Excepciones
+ * Tabla de multiplicar con for y manejo de excepciones
  *
- * Autor: [Tu nombre aquí]
- * Fecha: [Fecha]
+ * Autor: Norlan Gago
+ * Fecha: 2026-11-16
  */
 public class Ejercicio5 {
 
+    // Semilla: propiedad del autograde, variable de entorno o dialogo
+    static String leerSemilla() {
+        String s = System.getProperty("autograde.semilla");
+        if (s == null) s = System.getenv("AUTOGRADE_SEMILLA");
+        if (s == null) {
+            s = JOptionPane.showInputDialog(
+                    "Ingresa los ultimos 3 digitos de tu cedula:");
+        }
+        return s;
+    }
+
+    // Siempre imprime en consola; muestra el dialogo solo si hay GUI
+    static void mostrar(String texto) {
+        System.out.println(texto);
+        if (!java.awt.GraphicsEnvironment.isHeadless()) {
+            JOptionPane.showMessageDialog(null, texto);
+        }
+    }
+
     public static void main(String[] args) {
 
-        // ============================================================
-        // TODO 1: Leer la semilla (últimos 3 dígitos de tu cédula)
-        // ============================================================
-        int semilla = 0;
+        // Semilla
+        String entradaSemilla = leerSemilla();
+        if (entradaSemilla == null) {
+            return; // el usuario cancelo
+        }
+        int semilla;
+        try {
+            semilla = Integer.parseInt(entradaSemilla.trim());
+        } catch (NumberFormatException e) {
+            mostrar("Entrada invalida. Debes ingresar un numero.");
+            return;
+        }
 
-        // ============================================================
-        // TODO 2: Calcular M y L con la semilla:
-        //   M = 2 + (semilla % 19)    → número de la tabla (2-20)
-        //   L = 5 + (semilla % 8)     → límite de la tabla (5-12)
-        // ============================================================
-        int m = 0;
-        int l = 0;
+        // Datos de la semilla
+        int mSemilla = 2 + (semilla % 19); // 2 - 20
+        int l = 5 + (semilla % 8);         // 5 - 12
 
-        // ============================================================
-        // TODO 3: Implementar la tabla de multiplicar con:
-        //   - Un bloque TRY que:
-        //       1. Lanza IllegalArgumentException si M < 1 o M > 20
-        //          con mensaje: "Error: numero fuera de rango [1-20]"
-        //       2. Construye la tabla con un ciclo FOR de 1 hasta L
-        //          Formato de cada línea: "M x i  = resultado"
-        //   - Un CATCH para NumberFormatException:
-        //       Muestra: "Error: entrada no numerica"
-        //   - Un CATCH para IllegalArgumentException:
-        //       Muestra el mensaje de la excepción
-        //   - Un bloque FINALLY que siempre imprime: "Proceso finalizado"
-        //
-        // Nota: en este ejercicio el valor de M ya está calculado por
-        // la semilla, no lo leas del JOptionPane (el autograde lo controla).
-        // El try/catch se aplica para demostrar el manejo de excepciones
-        // con la validación del rango.
-        // ============================================================
+        // M ya viene calculado por la semilla; se trata como texto para
+        // demostrar el manejo de NumberFormatException con parseInt
+        String entradaM = String.valueOf(mSemilla);
 
-        StringBuilder tabla = new StringBuilder();
+        StringBuilder salida = new StringBuilder();
+
+        try {
+            int m = Integer.parseInt(entradaM.trim()); // NumberFormatException si no es numero (o null)
+
+            if (m < 1 || m > 20) {
+                throw new IllegalArgumentException("Error: numero fuera de rango [1-20]");
+            }
+
+            salida.append("Tabla del ").append(m).append("\n");
+            for (int i = 1; i <= l; i++) {
+                salida.append(String.format("%d x %-2d = %d%n", m, i, m * i));
+            }
+        } catch (NumberFormatException e) {
+            // Debe ir antes que IllegalArgumentException (es su subclase)
+            salida.append("Error: entrada no numerica\n");
+        } catch (IllegalArgumentException e) {
+            salida.append(e.getMessage()).append("\n");
+        } finally {
+            salida.append("Proceso finalizado\n");
+        }
+
+        // Nombre de PC y fecha/hora
         String nombrePC = "DESCONOCIDO";
-        String fechaHora = "";
+        try {
+            nombrePC = InetAddress.getLocalHost().getHostName();
+        } catch (Exception e) {
+            // se mantiene "DESCONOCIDO"
+        }
+        String fechaHora = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-        // --- escribe tu try / catch / finally aquí ---
+        salida.append("Computadora: ").append(nombrePC)
+              .append(" | Fecha: ").append(fechaHora);
 
-
-        // ============================================================
-        // TODO 4: Mostrar resultado con JOptionPane.showMessageDialog
-        // Formato EXACTO (salida normal):
-        //   Tabla del M
-        //   M x 1  = M
-        //   M x 2  = 2M
-        //   ...
-        //   M x L  = resultado
-        //   Proceso finalizado
-        //   Computadora: <nombre-PC> | Fecha: YYYY-MM-DD HH:MM:SS
-        // ============================================================
-
+        mostrar(salida.toString());
     }
 }
