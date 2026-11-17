@@ -1,4 +1,6 @@
 import javax.swing.JOptionPane;
+
+import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -12,44 +14,64 @@ import java.time.format.DateTimeFormatter;
 public class Ejercicio4 {
 
     public static void main(String[] args) {
-
-        // ============================================================
-        // Variables de control
-        // ============================================================
-        int intentos = 0;
+        
+    int intentos = 0;
         boolean valida = false;
         String contrasena = "";
 
-        // ============================================================
-        // TODO 1: Implementar el ciclo DO-WHILE que:
-        //   1. Pide una contraseña con JOptionPane.showInputDialog
-        //   2. Incrementa el contador de intentos
-        //   3. Verifica las 3 reglas en orden:
-        //      a. Longitud >= 8  → si falla: "La contrasena debe tener al menos 8 caracteres"
-        //      b. Contiene dígito (usa Character.isDigit en un for)
-        //                        → si falla: "La contrasena debe tener al menos un digito"
-        //      c. Contiene mayúscula (usa Character.isUpperCase en un for)
-        //                        → si falla: "La contrasena debe tener al menos una mayuscula"
-        //   4. Si cumple las 3: muestra JOptionPane con "Contrasena aceptada"
-        //      y pone valida = true
-        //   5. Si falla alguna: muestra el mensaje de error con JOptionPane
-        //      y continúa el ciclo
-        // El ciclo repite mientras !valida
-        // ============================================================
+        do {
+            contrasena = JOptionPane.showInputDialog("Ingrese una contraseña:");
+            if (contrasena == null) {
+                contrasena = "";
+            }
+            intentos++;
 
-        // ============================================================
-        // TODO 2: Obtener nombre de PC y fecha/hora
-        // ============================================================
+            if (contrasena.length() < 8) {
+                JOptionPane.showMessageDialog(null, "La contrasena debe tener al menos 8 caracteres");
+                continue;
+            }
+
+            boolean tieneDigito = false;
+            boolean tieneMayuscula = false;
+
+            for (int i = 0; i < contrasena.length(); i++) {
+                char c = contrasena.charAt(i);
+                if (Character.isDigit(c)) {
+                    tieneDigito = true;
+                }
+                if (Character.isUpperCase(c)) {
+                    tieneMayuscula = true;
+                }
+            }
+
+            if (!tieneDigito) {
+                JOptionPane.showMessageDialog(null, "La contrasena debe tener al menos un digito");
+                continue;
+            }
+
+            if (!tieneMayuscula) {
+                JOptionPane.showMessageDialog(null, "La contrasena debe tener al menos una mayuscula");
+                continue;
+            }
+
+            valida = true;
+
+        } while (!valida);
+
         String nombrePC = "DESCONOCIDO";
-        String fechaHora = "";
+        try {
+            nombrePC = InetAddress.getLocalHost().getHostName();
+        } catch (Exception e) {
+            nombrePC = "LOCAL";
+        }
 
-        // ============================================================
-        // TODO 3: Mostrar resultado final con JOptionPane.showMessageDialog
-        // Formato EXACTO:
-        //   Contrasena aceptada
-        //   Intentos realizados: X
-        //   Computadora: <nombre-PC> | Fecha: YYYY-MM-DD HH:MM:SS
-        // ============================================================
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String fechaHora = dtf.format(LocalDateTime.now());
 
+        String resultado = String.format("Contrasena aceptada\nIntentos realizados: %d\nComputadora: %s | Fecha: %s",
+                intentos, nombrePC, fechaHora);
+
+        JOptionPane.showMessageDialog(null, resultado);
     }
 }
+
