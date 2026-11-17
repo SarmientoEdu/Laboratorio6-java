@@ -1,4 +1,7 @@
 import javax.swing.JOptionPane;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -12,10 +15,19 @@ import java.time.format.DateTimeFormatter;
  */
 public class Ejercicio1 {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        // TODO 1: leer la semilla (últimos 3 dígitos de la cédula)
-        String entrada = JOptionPane.showInputDialog("Ingresa los ultimos 3 digitos de tu cedula:");
+        // TODO 1: leer la semilla (ultimos 3 digitos de la cedula)
+        // Si no hay pantalla (autograde), la semilla llega por stdin.
+        boolean headless = java.awt.GraphicsEnvironment.isHeadless();
+
+        String entrada;
+        if (headless) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            entrada = br.readLine();
+        } else {
+            entrada = JOptionPane.showInputDialog("Ingresa los ultimos 3 digitos de tu cedula:");
+        }
         int semilla = Integer.parseInt(entrada.trim());
 
         // TODO 2: calcular la temperatura
@@ -53,6 +65,10 @@ public class Ejercicio1 {
                 + "Clasificacion: " + clasificacion + "\n"
                 + "Computadora: " + nombrePC + " | Fecha: " + fechaHora;
 
-        JOptionPane.showMessageDialog(null, mensaje);
+        if (headless) {
+            System.out.println(mensaje);
+        } else {
+            JOptionPane.showMessageDialog(null, mensaje);
+        }
     }
 }
